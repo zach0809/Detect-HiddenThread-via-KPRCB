@@ -20,8 +20,20 @@ void hidden_system_threads_detect()
 			PETHREAD p_thread = 0;
 			PsLookupThreadByThreadId(reinterpret_cast<HANDLE>(current_tid), &p_thread);
 
-			if (p_thread == 0)
+			if (p_thread == 0){
 				DbgPrintEx(0, 0, "[PspCidTable] hidden thread id -> %d\n", current_tid);
+			}else{
+				//Get the thread id of the thread returned.
+				ULONG RetThreadID = reinterpret_cast<ULONG>(PsGetThreadID(p_thread));
+
+				//Check for swapped PspCidTable entry
+				if(RetThreadID!=current_tid)
+					DbgPrintEx(0, 0, "[PspCidTable] A KTHREAD found via the KPRCB has a tid of %d but the tid of the cid table entry for this thread is %d!\n", current_tid, RetThreadID);
+
+				//Check for non-system thread returned when the actual thread from KPRCB is a sys thread
+				if(PsIsSystemThread(p_thread) != PsIsSystemThread((PETHREAD)entry))
+					DbgPrintEx(0, 0, "[PspCidTable] IsSystemThread is spoofed for tid of %d\n", current_tid);
+			}	
 		}
 	}
 }
