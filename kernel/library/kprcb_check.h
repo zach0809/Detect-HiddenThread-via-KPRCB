@@ -30,7 +30,7 @@ void hidden_system_threads_detect()
 				if(RetThreadID!=current_tid)
 					DbgPrintEx(0, 0, "[PspCidTable] A KTHREAD found via the KPRCB has a tid of %d but the tid of the cid table entry for this thread is %d!\n", current_tid, RetThreadID);
 
-				//Check for non-system thread returned when the actual thread from KPRCB is a sys thread
+				//Validate the IsSystemThread flag for the entry in the PspCidTable
 				if(PsIsSystemThread(p_thread) != PsIsSystemThread((PETHREAD)entry))
 					DbgPrintEx(0, 0, "[PspCidTable] IsSystemThread is spoofed for tid of %d\n", current_tid);
 			}	
